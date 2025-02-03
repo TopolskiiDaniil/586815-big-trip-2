@@ -1,14 +1,19 @@
+import dayjs from 'dayjs';
+
 const isDatesChanged = (previousEvents, currentEvents) => {
   if (previousEvents.length !== currentEvents.length) {
     return true;
   }
 
-  const sortedPreviousEvents = [...previousEvents].sort((eventA, eventB) => new Date(eventA.dateFrom) - new Date(eventB.dateFrom));
-  const sortedCurrentEvents = [...currentEvents].sort((eventA, eventB) => new Date(eventA.dateFrom) - new Date(eventB.dateFrom));
+  const sortedPreviousEvents = previousEvents.sort((eventA, eventB) => dayjs(eventA.dateFrom) - dayjs(eventB.dateFrom));
+  const sortedCurrentEvents = currentEvents.sort((eventA, eventB) => dayjs(eventA.dateFrom) - dayjs(eventB.dateFrom));
 
-  const isNotSameDate = () => sortedPreviousEvents[0].dateFrom.toISOString().split('T')[0] !== sortedCurrentEvents[0].dateFrom.toISOString().split('T')[0] || sortedPreviousEvents[sortedPreviousEvents.length - 1].dateTo.toISOString().split('T')[0] !== sortedCurrentEvents[sortedCurrentEvents.length - 1].dateTo.toISOString().split('T')[0];
+  const prevDateFrom = dayjs(sortedPreviousEvents[0].dateFrom);
+  const currentDateFrom = dayjs(sortedCurrentEvents[0].dateFrom);
+  const prevDateTo = dayjs(sortedPreviousEvents[sortedPreviousEvents.length - 1].dateTo);
+  const currentDateTo = dayjs(sortedCurrentEvents[sortedCurrentEvents.length - 1].dateTo);
 
-  return isNotSameDate();
+  return !prevDateFrom.isSame(currentDateFrom, 'date') || !prevDateTo.isSame(currentDateTo, 'date');
 };
 
 const isCitiesChanged = (previousEvents, currentEvents, destinationsModel) => {
